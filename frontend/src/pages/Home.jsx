@@ -16,17 +16,26 @@ const Home = () => {
           axios.get('/api/projects'),
           axios.get('/api/skills')
         ]);
+        
+        // Safety check: if the response is HTML (like a 404 redirect), it's not our API data.
+        if (typeof profileRes.data === 'string' && profileRes.data.includes('<!DOCTYPE html>')) {
+           throw new Error("Received HTML instead of JSON. The VITE_API_URL is likely missing or incorrect.");
+        }
+
         setProfile(profileRes.data);
-        setProjects(projectsRes.data);
-        setSkills(skillsRes.data);
+        setProjects(projectsRes.data || []);
+        setSkills(skillsRes.data || []);
       } catch (error) {
-        console.error("Error fetching data", error);
+        console.error("Error fetching data:", error);
+        // Set a dummy profile so the page doesn't crash completely while debugging
+        setProfile({ name: "Error Loading Data", subtitle: "Check API Connection", title: "API Unreachable", description: error.message });
       }
     };
     fetchData();
   }, []);
 
   if (!profile) return <div className="h-screen flex items-center justify-center text-white">Loading...</div>;
+  if (!profile.name) return <div className="h-screen flex items-center justify-center text-white">API returned invalid data format.</div>;
 
   const nameParts = profile.name.split(' ');
   const firstName = nameParts[0];
