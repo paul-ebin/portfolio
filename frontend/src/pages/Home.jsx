@@ -18,7 +18,7 @@ const Home = () => {
         ]);
         
         // Safety check: if the response is HTML (like a 404 redirect), it's not our API data.
-        if (typeof profileRes.data === 'string' && profileRes.data.includes('<!DOCTYPE html>')) {
+        if (typeof profileRes.data === 'string' && profileRes.data.toLowerCase().includes('<!doctype html>')) {
            throw new Error("Received HTML instead of JSON. The VITE_API_URL is likely missing or incorrect.");
         }
 
